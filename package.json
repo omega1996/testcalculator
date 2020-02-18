@@ -1,0 +1,12 @@
+{
+  "name": "test-work",
+  "version": "1.0.0",
+  "description": "This is the node.js test for byndyusoft job application ",
+  "main": "index.js", 
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "Ryazanov Ivan <omega1996@me.com>",
+  "license": "MIT"
+}
