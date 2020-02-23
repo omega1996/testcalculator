@@ -4,7 +4,8 @@
   "description": "This is the node.js test for byndyusoft job application ",
   "main": "index.js",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "start": "node main.js"
   },
   "keywords": [],
   "author": "Ryazanov Ivan <omega1996@me.com>",

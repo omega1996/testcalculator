@@ -7,51 +7,65 @@ const int = readline.createInterface({
 
 int.question('Введите выражение: ', (answer) => {
     // TODO: complete the task
-    let parsedTree = parseAnswer(answer);
-    let calculated = calculateTree(parsedTree);
-    console.log(`Результат: ${calculated}`);
+    parseAnswer(answer)
+        .then(calculateTree)
+        .then(calculated=>console.log(`Результат: ${calculated}`))
+        .catch(error=>{console.error(error)})
+        .then(int.close())
 
-    int.close();
 });
 
-
-(a+(b+c))+(a+b)
-
 const sum = (...args) => args.reduce((prev,curr)=>prev+curr)  //subtraction is a type of summation
-const div = (a, b) => a / b
+const div = (a, b) => a/b
 const mul = (a, b) => a * b
 
-const growTree = (parsedAnswer, initial=0)=>{
-    let expression = initial===0?{sum:[]}:{sum: [initial]};
-    parsedAnswer.reduce((previousValue, currentValue, index, array)  => {
-        if (!isNaN(parseFloat(previousValue)) && !isNaN(parseFloat(currentValue)) ){
-            expression['sum'].push(parseFloat(previousValue))
-            if (index === array.length-1){
-                expression['sum'].push(parseFloat(currentValue))
-            }
-            return currentValue
-        } else if (!isNaN(parseFloat(previousValue)) && isNaN(parseFloat(currentValue))){
-            if (currentValue === '('){
-                expression['sum'].push(parseFloat(previousValue))
-                return growTree(array.slice(index))
-            } else if (currentValue === ')'){
-                return currentValue
-            } else if (currentValue === '+'){
-                expression['sum'].push(parseFloat(previousValue))
-                return growTree(array.slice(index))
-            }
-        } else if (isNaN(parseFloat(previousValue)) && isNaN(parseFloat(currentValue))){
+const parseAnswer = (answer)=>{
+    let promise = new Promise(resolve=>{
+        let matchedArray = answer.match(/([)(*/]|[-+]?\d[.]?\d*|[-])/g)
+        matchedArray = matchedArray.map(element => !isNaN(parseFloat(element)) ?  parseFloat(element) : element)
+        resolve(matchedArray)
+    });
+    return promise
+}
 
+const evaluateMath = (mathExp)=>{
+    if (Array.isArray(mathExp)){
+        if (mathExp.indexOf('-')!== -1){
+            let subIndex = mathExp.indexOf('-')
+            mathExp.splice(subIndex, 2, mathExp[subIndex+1]*(-1))
+            return evaluateMath(mathExp)
+        } else if (mathExp.lastIndexOf('*') !== -1){
+            let multiplyIndex = mathExp.lastIndexOf('*')
+            let resultMul = mul(mathExp[multiplyIndex-1],mathExp[multiplyIndex+1])
+            mathExp.splice(multiplyIndex-1, 3, resultMul)
+            return evaluateMath(mathExp)
+        } else if (mathExp.lastIndexOf('/') !== -1){
+            let multiplyIndex = mathExp.lastIndexOf('/')
+            let resultMul = div(mathExp[multiplyIndex-1], mathExp[multiplyIndex+1])
+            mathExp.splice(multiplyIndex-1, 3, resultMul)
+            return evaluateMath(mathExp)
         }
-    })
-    return expression
+        else {
+            return sum(...mathExp)
+        }
+    } else {
+        return mathExp
+    }
 }
 
-const parseAnswer = (answer) => {
-    let regExp = /([)(*/]|[-+]?\d*)/g;
-    let parsedAnswer = answer.match(regExp).filter(a=>a);
-    let tree = growTree(parsedAnswer);
-    return tree
+const calculateTree = (fwdList)=>{
+    if(fwdList.indexOf(')') !== -1){
+        let LeftSide = fwdList.slice(0,fwdList.indexOf(')'))
+        let cutList = LeftSide.slice(fwdList.lastIndexOf('(')+1)
+        let cutListLength = cutList.length+2
+        let mathRes = evaluateMath(cutList)
+        fwdList.splice(LeftSide.lastIndexOf('('), cutListLength, mathRes)
+        let answer = calculateTree(fwdList)
+        return answer
+    } else {
+        let answer = evaluateMath(fwdList)
+        return answer
+    }
 }
 
-module.exports = {sum, div, mul, parseAnswer}
+module.exports = {sum, div, mul, calculateTree, evaluateMath, parseAnswer}
