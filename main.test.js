@@ -72,8 +72,6 @@ describe('Parsing functions:',()=>{
     test('Should not return "+" signs',async ()=> {
         expect( await parseAnswer('2+(2-2)')).toEqual([2,'(',2,-2,')']);
     });
-
-
 });
 
 
@@ -92,5 +90,4 @@ describe('Calculating functions:',()=>{
         expect( calculateTree([2,'(',2,-2,')'])).toBe(2);
         expect( calculateTree([2,'(',2,'*',-2,')'])).toBe(-2);
     });
-
 });
