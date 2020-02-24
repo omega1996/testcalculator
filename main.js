@@ -43,14 +43,13 @@ const evaluateMath = (mathExp) => {
         let resultMul = div(mathExp[multiplyIndex - 1], mathExp[multiplyIndex + 1]);
         mathExp.splice(multiplyIndex - 1, 3, resultMul);
         return evaluateMath(mathExp);
-    }
-    else {
+    } else {
         return sum(...mathExp);
     }
 
 };
 
-const calculateTree = (fwdList)=>{
+const calculateTree = (fwdList) => {
     if(fwdList.indexOf(")") === -1) return evaluateMath(fwdList);
 
     let LeftSide = fwdList.slice(0,fwdList.indexOf(")"));
